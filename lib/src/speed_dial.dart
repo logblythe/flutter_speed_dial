@@ -12,6 +12,7 @@ class SpeedDial extends StatefulWidget {
 
   /// Used to get the button hidden on scroll. See examples for more info.
   final bool visible;
+  final GlobalKey<SpeedDialState> key;
 
   /// The curve used to animate the button on scrolling.
   final Curve curve;
@@ -57,6 +58,7 @@ class SpeedDial extends StatefulWidget {
   final int animationSpeed;
 
   SpeedDial({
+    this.key,
     this.children = const [],
     this.visible = true,
     this.backgroundColor,
@@ -81,10 +83,10 @@ class SpeedDial extends StatefulWidget {
   });
 
   @override
-  _SpeedDialState createState() => _SpeedDialState();
+  SpeedDialState createState() => SpeedDialState();
 }
 
-class _SpeedDialState extends State<SpeedDial> with SingleTickerProviderStateMixin {
+class SpeedDialState extends State<SpeedDial> with SingleTickerProviderStateMixin {
   AnimationController _controller;
 
   bool _open = false;
@@ -116,6 +118,7 @@ class _SpeedDialState extends State<SpeedDial> with SingleTickerProviderStateMix
     }
   }
 
+
   @override
   void didUpdateWidget(SpeedDial oldWidget) {
     if (oldWidget.children.length != widget.children.length) {
@@ -125,7 +128,8 @@ class _SpeedDialState extends State<SpeedDial> with SingleTickerProviderStateMix
     super.didUpdateWidget(oldWidget);
   }
 
-  void _toggleChildren() {
+
+  void toggleChildren() {
     var newValue = !_open;
     setState(() {
       _open = newValue;
@@ -163,7 +167,7 @@ class _SpeedDialState extends State<SpeedDial> with SingleTickerProviderStateMix
             labelWidget: child.labelWidget,
             onTap: child.onTap,
             toggleChildren: () {
-              if (!widget.closeManually) _toggleChildren();
+              if (!widget.closeManually) toggleChildren();
             },
             shape: child.shape,
             heroTag: widget.heroTag != null ? '${widget.heroTag}-child-$index' : null,
@@ -181,7 +185,7 @@ class _SpeedDialState extends State<SpeedDial> with SingleTickerProviderStateMix
       top: _open ? 0.0 : null,
       left: _open ? 0.0 : null,
       child: GestureDetector(
-        onTap: _toggleChildren,
+        onTap: toggleChildren,
         child: BackgroundOverlay(
           animation: _controller,
           color: widget.overlayColor,
@@ -209,8 +213,8 @@ class _SpeedDialState extends State<SpeedDial> with SingleTickerProviderStateMix
       backgroundColor: widget.backgroundColor,
       foregroundColor: widget.foregroundColor,
       elevation: widget.elevation,
-      onLongPress: _toggleChildren,
-      callback: (_open || widget.onPress == null) ? _toggleChildren : widget.onPress,
+      onLongPress: toggleChildren,
+      callback: (_open || widget.onPress == null) ? toggleChildren : widget.onPress,
       child: child,
       heroTag: widget.heroTag,
       shape: widget.shape,
